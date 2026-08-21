@@ -106,7 +106,7 @@ function render(){
   let html = '';
   messages.forEach(m=>{
     if(m.error){
-      html += '<div class="bubble-row ai"><div class="avatar ai-av">⚡</div><div class="error-bubble">⚠️ Repons lan pa t rive. <button class="retry-link" data-retry="1">Eseye ankò</button></div></div>';
+      html += '<div class="bubble-row ai"><div class="avatar ai-av">⚡</div><div class="error-bubble">⚠️ ' + escapeHtml(m.content || 'Repons lan pa t rive.') + ' <button class="retry-link" data-retry="1">Eseye ankò</button></div></div>';
       return;
     }
     const cls = m.role === 'user' ? 'user' : 'ai';
@@ -155,11 +155,11 @@ async function callAI(){
       body: JSON.stringify({ messages: apiMessages })
     });
     const data = await response.json();
-    if(!response.ok || data.error) throw new Error(data.error || 'erè');
+    if(!response.ok || data.error) throw new Error(data.error || ('HTTP ' + response.status));
     messages.push({role:'assistant', content:data.text});
     saveChat();
   } catch(e){
-    messages.push({role:'assistant', content:'', error:true});
+    messages.push({role:'assistant', content:e.message || 'Erè enkoni', error:true});
   } finally {
     loading = false;
     document.getElementById('sendBtn').disabled = false;
